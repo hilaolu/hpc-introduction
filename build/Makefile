@@ -8,14 +8,14 @@ CFLAG=-Wall -c -MMD -std=c++14 -g
 LFLAG=-Wall -lm
 TARGET=$(BIN_DIR)/$(PROJ)
 OBJECT=$(patsubst $(SOURCE)/%.cpp, $(OBJ_DIR)/%.o, $(wildcard $(SOURCE)/*.cpp))
-LIB_DIR_1=$(LIB_DIR)/algorithm
+LIB_DIR_1=$(LIB_DIR)/hpc
 OBJECT_1=$(patsubst $(LIB_DIR_1)/%.cpp, $(OBJ_DIR)/%.o, $(wildcard $(LIB_DIR_1)/*.cpp))
 PROJ=$(proj)
 proj=
 all:check_proj $(TARGET) $(LIB)
 
 $(TARGET):%:$(OBJECT) $(OBJECT_1)
-	$(CC) $(LFLAG) $^ -o $(TARGET)
+	$(CC) $(LFLAG) $^ -o $(TARGET) -lopenblas
 
 $(OBJECT):$(OBJ_DIR)/%.o:$(SOURCE)/%.cpp
 	$(CC) -I$(SEARCH_PATH) $(CFLAG) $< -o $@

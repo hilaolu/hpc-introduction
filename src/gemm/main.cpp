@@ -1,21 +1,54 @@
 #include <iostream>
 #include <fstream>
+#include <chrono>
+#include <f77blas.h>
 
-int a[1024][1024];
-int b[1024][1024];
-int c[1024][1024];
+#include "hpc/include/gemm.hpp"
+
+double a[1048576];
+double b[1048576];
+double c[1048576];
 
 using namespace std;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
 int main(){
-    std::fstream input("", std::ios_base::in);
+    std::fstream input("bin/random.txt", std::ios_base::in);
     int n;
     cin>>n;
     int tmp;
-    for(int i=0;i<n;++i){
-        for(int j=0;j<n;++j){
-            cin>>tmp;
-            a[i][j]=tmp;
-        }
+    //init a,b
+    for(int i=0;i<n*n;++i){
+        input>>tmp;
+        a[i]=tmp;
+        b[i]=tmp;
     }
-        
+    
+    
+    cout<<"init ok"<<endl;
+    
+    
+    //multiply 
+    
+    for(int i=0;i<n*n;++i){
+        c[i]=0;
+    }
+    
+    
+    char ta = 'N';
+    char tb = 'N';
+    double alpha = 1;
+    double beta = 0;
+    
+    auto t1=high_resolution_clock::now();
+    dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,c,&n);
+    // mul_gemm_plain(a,b,c,n);
+    // mul_gemm_opt_locality(a,b,c,n);
+    auto t2=high_resolution_clock::now();
+    duration<double, std::milli> ms_double = t2 - t1;
+    cout<<ms_double.count()<<endl;
+    
+    
+    
+    cin.get();
 }
