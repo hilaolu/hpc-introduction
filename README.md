@@ -1,1 +1,1 @@
-repo->https://github.com/hilaolu/hpc-introduction/releases
+report->https://github.com/hilaolu/hpc-introduction/releases
