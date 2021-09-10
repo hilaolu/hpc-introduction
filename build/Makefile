@@ -15,7 +15,7 @@ proj=
 all:check_proj $(TARGET) $(LIB)
 
 $(TARGET):%:$(OBJECT) $(OBJECT_1)
-	$(CC) $(LFLAG) $^ -o $@
+	$(CC) $(LFLAG) $^ -o $(TARGET)
 
 $(OBJECT):$(OBJ_DIR)/%.o:$(SOURCE)/%.cpp
 	$(CC) -I$(SEARCH_PATH) $(CFLAG) $< -o $@
