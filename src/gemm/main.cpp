@@ -41,8 +41,8 @@ int main(){
     double beta = 0;
     
     auto t1=high_resolution_clock::now();
-    dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,c,&n);
-    // mul_gemm_plain(a,b,c,n);
+    // dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,c,&n);
+    mul_gemm_plain(a,b,c,n);
     // mul_gemm_opt_locality(a,b,c,n);
     auto t2=high_resolution_clock::now();
     duration<double, std::milli> ms_double = t2 - t1;
