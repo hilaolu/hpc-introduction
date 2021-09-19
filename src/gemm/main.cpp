@@ -5,9 +5,9 @@
 
 #include "hpc/include/gemm.hpp"
 
-double a[1048576];
-double b[1048576];
-double c[1048576];
+double a[10485760];
+double b[10485760];
+double c[10485760];
 
 using namespace std;
 using std::chrono::high_resolution_clock;

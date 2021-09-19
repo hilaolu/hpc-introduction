@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cassert>
 #include <f77blas.h>
+#include <cpanic>
 
 double a[10485760];
 double b[10485760];
@@ -23,6 +24,7 @@ void* mul_gemm_plain(void* worker_id);
 #define PROCESSORS_COUNT 12
 #define abs(a) (a>0?a:-a)
 int main(){
+    panic();
     std::fstream input("bin/random.txt", std::ios_base::in);
     cin>>n;
     int tmp;
@@ -59,7 +61,6 @@ int main(){
     for(int i=0;i<PROCESSORS_COUNT;++i){
         worker_id[i]=i;
     }
-    
     for(int i=0;i<PROCESSORS_COUNT;++i){
         int error;
         error=pthread_create(&tid[i],NULL,mul_gemm_plain,&worker_id[i]);
@@ -74,15 +75,14 @@ int main(){
     auto t2=high_resolution_clock::now();
     duration<double, std::milli> ms_double = t2 - t1;
     cout<<ms_double.count()<<endl;
-    dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,ref,&n);
-    
-    for(int i=0;i<n*n;i++){
-	if(abs(ref[i]-c[i])>0.1){
-            
-            printf("%lf %lf %d\n",ref[i],c[i],i);
-            cin.get();
-        }
-    }
+    // dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,ref,&n);
+    // 
+    // for(int i=0;i<n*n;i++){
+	// if(abs(ref[i]-c[i])>0.1){
+    //         printf("%lf %lf %d\n",ref[i],c[i],i);
+    //         cin.get();
+    //     }
+    // }
 
 
 
@@ -99,15 +99,12 @@ void* mul_gemm_plain(void* worker_id){
     //printf("%d %d\n",start,end);
     int tmp;
     for(int i=start;i<end;i++){
-        
         for(int k=0;k<n;k++){
-	    tmp=a[i*n+k];
+            tmp=a[i*n+k];
             for(int j=0;j<n;j++){
                 c[i*n+j]+=tmp*b[k*n+j];
-                
             }
-
         }
-
     }
+    return nullptr;
 }
