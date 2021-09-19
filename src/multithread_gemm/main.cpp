@@ -1,11 +1,10 @@
 #include "gemm.hpp"
-
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <chrono>
 #include <cassert>
 #include <f77blas.h>
-#include <cpanic>
 
 double a[10485760];
 double b[10485760];
@@ -24,7 +23,6 @@ void* mul_gemm_plain(void* worker_id);
 #define PROCESSORS_COUNT 12
 #define abs(a) (a>0?a:-a)
 int main(){
-    panic();
     std::fstream input("bin/random.txt", std::ios_base::in);
     cin>>n;
     int tmp;
