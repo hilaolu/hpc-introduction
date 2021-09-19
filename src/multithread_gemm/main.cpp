@@ -24,7 +24,7 @@ void* mul_gemm_plain(void* worker_id);
 #define abs(a) (a>0?a:-a)
 int main(){
     std::fstream input("bin/random.txt", std::ios_base::in);
-    cin>>n;
+    
     int tmp;
     //init a,b
     for(int i=0;i<n*n;++i){
@@ -38,54 +38,55 @@ int main(){
     
     
     //multiply 
-    
-    for(int i=0;i<n*n;++i){
-        c[i]=0;
-    }
-    
-    
-    char ta = 'N';
-    char tb = 'N';
-    double alpha = 1;
-    double beta = 0;
-    
-    short_edge=n/PROCESSORS_COUNT;
-    last_edge=n-short_edge*(PROCESSORS_COUNT-1);
-    
-    auto t1=high_resolution_clock::now();
-    pthread_t tid[PROCESSORS_COUNT];
-    
-    int worker_id[PROCESSORS_COUNT];
-    for(int i=0;i<PROCESSORS_COUNT;++i){
-        worker_id[i]=i;
-    }
-    for(int i=0;i<PROCESSORS_COUNT;++i){
-        int error;
-        error=pthread_create(&tid[i],NULL,mul_gemm_plain,&worker_id[i]);
-        assert(error==0);
-    }
-    
-    for(int i=0;i<PROCESSORS_COUNT;++i){
-        pthread_join(tid[i],NULL);
-    }
+    for(n=50;n<3000;n+=50){
+        for(int i=0;i<n*n;++i){
+            c[i]=0;
+        }
+        
+        
+        char ta = 'N';
+        char tb = 'N';
+        double alpha = 1;
+        double beta = 0;
+        
+        short_edge=n/PROCESSORS_COUNT;
+        last_edge=n-short_edge*(PROCESSORS_COUNT-1);
+        
+        auto t1=high_resolution_clock::now();
+        pthread_t tid[PROCESSORS_COUNT];
+        
+        int worker_id[PROCESSORS_COUNT];
+        for(int i=0;i<PROCESSORS_COUNT;++i){
+            worker_id[i]=i;
+        }
+        for(int i=PROCESSORS_COUNT-1;i>-1;--i){
+            int error;
+            error=pthread_create(&tid[i],NULL,mul_gemm_plain,&worker_id[i]);
+            assert(error==0);
+        }
+        
+        for(int i=0;i<PROCESSORS_COUNT;++i){
+            pthread_join(tid[i],NULL);
+        }
 
-    
-    auto t2=high_resolution_clock::now();
-    duration<double, std::milli> ms_double = t2 - t1;
-    cout<<ms_double.count()<<endl;
-    // dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,ref,&n);
-    // 
-    // for(int i=0;i<n*n;i++){
-	// if(abs(ref[i]-c[i])>0.1){
-    //         printf("%lf %lf %d\n",ref[i],c[i],i);
-    //         cin.get();
-    //     }
-    // }
-
-
+        
+        auto t2=high_resolution_clock::now();
+        duration<double, std::milli> ms_double = t2 - t1;
+        dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,ref,&n);
+        cout<<ms_double.count()<<endl;
+        
+        for(int i=0;i<n*n;i++){
+    	if(abs((ref[i]-c[i])/ref[i])>0.000001){
+                printf("%lf %lf %d\n",ref[i],c[i],i);
+                cin.get();
+            }
+        }
+    }
 
     cin.get();
 }
+
+
 
 void* mul_gemm_plain(void* worker_id){
     int id=*(int*)worker_id;
@@ -94,7 +95,6 @@ void* mul_gemm_plain(void* worker_id){
     if(id==PROCESSORS_COUNT-1){
         end=start+last_edge;
     }
-    //printf("%d %d\n",start,end);
     int tmp;
     for(int i=start;i<end;i++){
         for(int k=0;k<n;k++){
