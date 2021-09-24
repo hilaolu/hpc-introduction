@@ -20,7 +20,7 @@ int short_edge;
 int last_edge;
 
 void* mul_gemm_plain(void* worker_id);
-#define PROCESSORS_COUNT 12
+#define PROCESSORS_COUNT 12 
 #define abs(a) (a>0?a:-a)
 int main(){
     std::fstream input("bin/random.txt", std::ios_base::in);
@@ -69,18 +69,19 @@ int main(){
             pthread_join(tid[i],NULL);
         }
 
+
         
         auto t2=high_resolution_clock::now();
         duration<double, std::milli> ms_double = t2 - t1;
-        dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,ref,&n);
         cout<<ms_double.count()<<endl;
         
-        for(int i=0;i<n*n;i++){
-    	if(abs((ref[i]-c[i])/ref[i])>0.000001){
-                printf("%lf %lf %d\n",ref[i],c[i],i);
-                cin.get();
-            }
-        }
+        // dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,ref,&n);
+        // for(int i=0;i<n*n;i++){
+    	// if(abs((ref[i]-c[i])/ref[i])>0.000001){
+        //         printf("%lf %lf %d\n",ref[i],c[i],i);
+        //         cin.get();
+        //     }
+        // }
     }
 
     cin.get();
