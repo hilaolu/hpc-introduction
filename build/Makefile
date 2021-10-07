@@ -4,8 +4,8 @@ OBJ_DIR=./obj
 BIN_DIR=./bin
 LIB_DIR=../lib
 CC=g++
-CFLAG=-Wall -c -MMD -std=c++14 -g -O3 -march=native
-LFLAG=-Wall -lm -lpthread
+CFLAG=-Wall -c -MMD -std=c++14 -g  -O3 -march=native   -fopenmp 
+LFLAG=-Wall -lm -lpthread -fopenmp 
 TARGET=$(BIN_DIR)/$(PROJ)
 OBJECT=$(patsubst $(SOURCE)/%.cpp, $(OBJ_DIR)/%.o, $(wildcard $(SOURCE)/*.cpp))
 LIB_DIR_1=$(LIB_DIR)/hpc

@@ -1,4 +1,4 @@
-#include "gemm.hpp"
+#include <omp.h>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -20,6 +20,8 @@ int short_edge;
 int last_edge;
 
 void* mul_gemm_plain(void* worker_id);
+void mul_gemm_single();
+void gemm_omp(double* A,double* B,double* C,int n);
 #define PROCESSORS_COUNT 12 
 #define abs(a) (a>0?a:-a)
 int main(){
@@ -39,6 +41,7 @@ int main(){
     
     //multiply 
     for(n=50;n<3000;n+=50){
+        // n=3000;
         for(int i=0;i<n*n;++i){
             c[i]=0;
         }
@@ -53,21 +56,8 @@ int main(){
         last_edge=n-short_edge*(PROCESSORS_COUNT-1);
         
         auto t1=high_resolution_clock::now();
-        pthread_t tid[PROCESSORS_COUNT];
         
-        int worker_id[PROCESSORS_COUNT];
-        for(int i=0;i<PROCESSORS_COUNT;++i){
-            worker_id[i]=i;
-        }
-        for(int i=PROCESSORS_COUNT-1;i>-1;--i){
-            int error;
-            error=pthread_create(&tid[i],NULL,mul_gemm_plain,&worker_id[i]);
-            assert(error==0);
-        }
-        
-        for(int i=0;i<PROCESSORS_COUNT;++i){
-            pthread_join(tid[i],NULL);
-        }
+        mul_gemm_single();
 
         // dgemm_(&ta, &tb,&n,&n,&n,&alpha,a,&n,b,&n,&beta,ref,&n);
         
@@ -76,12 +66,12 @@ int main(){
         cout<<ms_double.count()<<endl;
     
         
-        // for(int i=0;i<n*n;i++){
-    	// if(abs((ref[i]-c[i])/ref[i])>0.000001){
-        //         printf("%lf %lf %d\n",ref[i],c[i],i);
-        //         cin.get();
-        //     }
-        // }
+        for(int i=0;i<n*n;i++){
+    	if(abs((ref[i]-c[i])/ref[i])>0.000001){
+                printf("%lf %lf %d\n",ref[i],c[i],i);
+                cin.get();
+            }
+        }
     }
 
     
@@ -110,3 +100,23 @@ void* mul_gemm_plain(void* worker_id){
     }
     return nullptr;
 }
+
+void mul_gemm_single(){
+    
+    #pragma omp parallel 
+    {
+        double tmp;
+        #pragma omp for
+        for(int i=0;i<n;i++){
+            for(int k=0;k<n;k++){
+                tmp=a[i*n+k];
+                for(int j=0;j<n;j++){
+                    c[i*n+j]+=tmp*b[k*n+j];
+                }
+            }
+        }
+    }
+
+}
+
+                
